@@ -1,5 +1,7 @@
 module Jekyll
 
+  require_relative 'post_filters'
+
   class PostTwitter < PostFilter
 
     require_relative 'post_bitly'
