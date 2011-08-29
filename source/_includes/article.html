@@ -11,12 +11,11 @@
   </header>
 {% endunless %}
 {% if index %}
-  {% capture content_excerpt_count %}{{ content | excerpt | count }}{% endcapture %}
-  {% capture content_count %}{{ content | count }}{% endcapture %}
   <div class="entry-content">{{ content | excerpt }}</div>
-  {% if content_count != content_excerpt_count %}
+  {% capture excerpted %}{{ content | has_excerpt }}{% endcapture %}
+  {% if excerpted == 'true' %}
     <footer>
-      <a rel="full-article" href="{{ root_url }}{{ post.url }}">Read on &rarr;</a>
+      <a rel="full-article" href="{{ root_url }}{{ post.url }}">{{ site.excerpt_link }}</a>
     </footer>
   {% endif %}
 {% else %}
