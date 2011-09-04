@@ -1,6 +1,13 @@
-require 'pp'
 module Jekyll
+
+  # Extended plugin type that allows the plugin
+  # to be called on varous callback methods.
+  #
+  # Examples:
+  # https://github.com/tedkulp/octopress/blob/master/plugins/post_metaweblog.rb
+  # https://github.com/tedkulp/octopress/blob/master/plugins/post_twitter.rb
   class PostFilter < Plugin
+
     #Called before post is sent to the converter. Allows
     #you to modify the post object before the converter
     #does it's thing
@@ -20,9 +27,16 @@ module Jekyll
     end
   end
 
+  # Monkey patch for the Jekyll Site class. For the original class,
+  # see: https://github.com/mojombo/jekyll/blob/master/lib/jekyll/site.rb
   class Site
+
+    # Instance variable to store the various post_filter
+    # plugins that are loaded.
     attr_accessor :post_filters
 
+    # Instantiates all of the post_filter plugins. This is basically
+    # a duplication of the other loaders in Site#setup.
     def load_post_filters
       self.post_filters = Jekyll::PostFilter.subclasses.select do |c|
         !self.safe || c.safe
@@ -32,9 +46,19 @@ module Jekyll
     end
   end
 
+  # Monkey patch for the Jekyll Post class. For the original class,
+  # see: https://github.com/mojombo/jekyll/blob/master/lib/jekyll/post.rb
   class Post
+
+    # Copy the #write method to #old_write, so we can redefine #write
+    # method.
     alias_method :old_write, :write
 
+    # Write the generated post file to the destination directory. It
+    # then calls any post_write methods that may exist.
+    #   +dest+ is the String path to the destination dir
+    #
+    # Returns nothing
     def write(dest)
       old_write(dest)
 
@@ -45,6 +69,10 @@ module Jekyll
       end
     end
 
+    # Call the pre_render methods on all of the loaded
+    # post_filter plugins.
+    #
+    # Returns nothing
     def pre_render
       if self.site.post_filters
         self.site.post_filters.each do |filter|
@@ -55,6 +83,10 @@ module Jekyll
       end
     end
 
+    # Call the post_render methods on all of the loaded
+    # post_filter plugins.
+    #
+    # Returns nothing
     def post_render
       if self.site.post_filters
         self.site.post_filters.each do |filter|
@@ -63,21 +95,41 @@ module Jekyll
       end
     end
 
+    # Returns the full url of the post, including the
+    # configured url
     def full_url
       self.site.config['url'] + self.url
     end
   end
 
+  # Monkey patch for the Jekyll Convertible module. For the original class,
+  # see: https://github.com/mojombo/jekyll/blob/master/lib/jekyll/convertible.rb
   module Convertible
+
+    # Copy the #transform method to #old_transform, so we can
+    # redefine #transform method.
     alias_method :old_transform, :transform
 
+    # Transform the contents based on the content type. Then calls the
+    # post_render method if it exists
+    #
+    # Returns nothing.
     def transform
       old_transform
       post_render if respond_to?(:post_render)
     end
 
+    # Copy the #do_layout method to #old_do_layout, so we can
+    # redefine #do_layout method.
     alias_method :old_do_layout, :do_layout
 
+    # Calls the pre_render method if it exists and then adds any necessary
+    # layouts to this convertible document.
+    #
+    # payload - The site payload Hash.
+    # layouts - A Hash of {"name" => "layout"}.
+    #
+    # Returns nothing.
     def do_layout(payload, layouts)
       pre_render if respond_to?(:pre_render)
       old_do_layout(payload, layouts)
