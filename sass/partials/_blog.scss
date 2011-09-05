@@ -90,7 +90,7 @@ article {
       margin-bottom: .8em;
       font-size: .85em;
     }
-    .byline + time:before, time +time:before, .comments:before, .byline ~ .categories:before {
+    .byline + time:before, time +time:before, .comments:before, .byline ~ .categories:before, .byline ~ .tags:before {
       @extend .separator;
     }
   }
