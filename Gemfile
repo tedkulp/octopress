@@ -11,6 +11,7 @@ gem 'compass', '>= 0.11'
 gem 'rubypants'
 gem 'rb-fsevent'
 gem 'stringex'
+gem 'unicode_utils'
 
 gem 'bitly'
 gem 'mongo'

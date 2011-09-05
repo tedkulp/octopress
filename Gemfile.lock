@@ -75,6 +75,7 @@ GEM
       multi_json (~> 1.0.0)
       multi_xml (~> 0.2.0)
       simple_oauth (~> 0.1.5)
+    unicode_utils (1.0.0)
 
 PLATFORMS
   ruby
@@ -95,3 +96,4 @@ DEPENDENCIES
   rubypants
   stringex
   twitter
+  unicode_utils
